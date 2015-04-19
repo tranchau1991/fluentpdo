@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Fluentpdo by lichtner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Fluentpdo</h1>
+      <h2 class="project-tagline">FluentPDO, smart SQL builder for PHP</h2>
+      <a href="https://github.com/lichtner/fluentpdo" class="btn">View on GitHub</a>
+      <a href="https://github.com/lichtner/fluentpdo/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/lichtner/fluentpdo/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="fluentpdo-" class="anchor" href="#fluentpdo-" aria-hidden="true"><span class="octicon octicon-link"></span></a>FluentPDO <a href="http://travis-ci.org/lichtner/fluentpdo"><img src="https://secure.travis-ci.org/lichtner/fluentpdo.png?branch=master" alt="Build Status"></a>
+</h1>
+
+<p>FluentPDO - smart SQL builder for PHP.</p>
+
+<p>FluentPDO is small PHP library for rapid query building. Killer feature is "Smart join builder" which generates joins automatically.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Fluent interface for creating queries step by step</li>
+<li>Smart join builder</li>
+<li>Simple API based on PDO and SQL syntax</li>
+<li>Build SELECT, INSERT, UPDATE &amp; DELETE queries</li>
+<li>Small and fast</li>
+<li>Type hinting with code completion in smart IDEs</li>
+<li>Requires PHP 5.1+ with any database supported by PDO</li>
+</ul>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<h3>
+<a id="composer" class="anchor" href="#composer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Composer</h3>
+
+<p>The preferred way to install FluentPDO is via <a href="http://getcomposer.org/">composer</a>.</p>
+
+<p>Add in your <code>composer.json</code>:</p>
+
+<pre><code>"require": {
+    ...
+    "lichtner/fluentpdo": "dev-master"  
+}
+</code></pre>
+
+<p>then update your dependencies with <code>composer update</code>.</p>
+
+<h3>
+<a id="copy" class="anchor" href="#copy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copy</h3>
+
+<p>If you are not familiar with composer just copy <code>/FluentPDO</code> directory into your <code>libs/</code> directory then:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>libs/FluentPDO/FluentPDO.php<span class="pl-pds">"</span></span>;</span></pre></div>
+
+<h2>
+<a id="start-usage" class="anchor" href="#start-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Start usage</h2>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$pdo</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">PDO</span>(<span class="pl-s"><span class="pl-pds">"</span>mysql:dbname=fblog<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$fpdo</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">FluentPDO</span>(<span class="pl-smi">$pdo</span>);</span></pre></div>
+
+<h2>
+<a id="first-example" class="anchor" href="#first-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>First example</h2>
+
+<p>FluentPDO is easy to use:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>where(<span class="pl-s"><span class="pl-pds">'</span>published_at &gt; ?<span class="pl-pds">'</span></span>, <span class="pl-smi">$date</span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>orderBy(<span class="pl-s"><span class="pl-pds">'</span>published_at DESC<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>limit(<span class="pl-c1">5</span>);</span>
+<span class="pl-s1"><span class="pl-k">foreach</span> (<span class="pl-smi">$query</span> <span class="pl-k">as</span> <span class="pl-smi">$row</span>) {</span>
+<span class="pl-s1">    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$row</span>[<span class="pl-s">title</span>]<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">}</span></pre></div>
+
+<p>executed query is:</p>
+
+<pre lang="mysql"><code>SELECT article.*
+FROM article
+WHERE published_at &gt; ?
+ORDER BY published_at DESC
+LIMIT 5
+</code></pre>
+
+<h2>
+<a id="smart-join-builder-how-to-build-queries" class="anchor" href="#smart-join-builder-how-to-build-queries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Smart join builder (how to build queries)</h2>
+
+<p>If you want to join table you can use full sql join syntax. For example we would like to show list of articles with author name:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>leftJoin(<span class="pl-s"><span class="pl-pds">'</span>user ON user.id = article.user_id<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>user.name<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>It was not so much smart, was it? ;-) If your database uses convention for primary and foreign key names, you can write only:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>leftJoin(<span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>user.name<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>Smarter? May be. but <strong>best practice how to write joins is not to write any joins ;-)</strong></p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>user.name<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>All three commands create same query:</p>
+
+<pre lang="mysql"><code>SELECT article.*, user.name 
+FROM article 
+LEFT JOIN user ON user.id = article.user_id
+</code></pre>
+
+<h2>
+<a id="simple-crud-query-examples" class="anchor" href="#simple-crud-query-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Simple CRUD Query Examples</h2>
+
+<h5>
+<a id="select" class="anchor" href="#select" aria-hidden="true"><span class="octicon octicon-link"></span></a>SELECT</h5>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>where(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>);</span>
+<span class="pl-s1"><span class="pl-c">// or shortly if you select one row by primary key</span></span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>);</span></pre></div>
+
+<h5>
+<a id="insert" class="anchor" href="#insert" aria-hidden="true"><span class="octicon octicon-link"></span></a>INSERT</h5>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$values</span> <span class="pl-k">=</span> <span class="pl-c1">array</span>(<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>article 1<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>content<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>content 1<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>insertInto(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>values(<span class="pl-smi">$values</span>);</span>
+<span class="pl-s1"><span class="pl-c">// or shortly</span></span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>insertInto(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>, <span class="pl-smi">$values</span>);</span></pre></div>
+
+<h5>
+<a id="update" class="anchor" href="#update" aria-hidden="true"><span class="octicon octicon-link"></span></a>UPDATE</h5>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$set</span> <span class="pl-k">=</span> <span class="pl-c1">array</span>(<span class="pl-s"><span class="pl-pds">'</span>published_at<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">FluentLiteral</span>(<span class="pl-s"><span class="pl-pds">'</span>NOW()<span class="pl-pds">'</span></span>));</span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>update(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>set(<span class="pl-smi">$set</span>)<span class="pl-k">-&gt;</span>where(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>);</span>
+<span class="pl-s1"><span class="pl-c">// or shortly if you update one row by primary key</span></span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>update(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>, <span class="pl-smi">$set</span>, <span class="pl-c1">1</span>);</span></pre></div>
+
+<h5>
+<a id="delete" class="anchor" href="#delete" aria-hidden="true"><span class="octicon octicon-link"></span></a>DELETE</h5>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>deleteFrom(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>where(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>);</span>
+<span class="pl-s1"><span class="pl-c">// or shortly if you delete one row by primary key</span></span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>deleteFrom(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>);</span></pre></div>
+
+<p><em>Note: INSERT, UPDATE and DELETE will be executed after <code>-&gt;execute()</code>:</em></p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>deleteFrom(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>)<span class="pl-k">-&gt;</span>execute();</span></pre></div>
+
+<p>Full documentation can be found on the <a href="http://fluentpdo.com">FluentPDO homepage</a></p>
+
+<h2>
+<a id="licence" class="anchor" href="#licence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licence</h2>
+
+<p>Free for commercial and non-commercial use (<a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License</a> or <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL</a>).</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/lichtner/fluentpdo">Fluentpdo</a> is maintained by <a href="https://github.com/lichtner">lichtner</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
