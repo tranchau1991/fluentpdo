@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Fluentpdo by lichtner</title>
+    <title>FluentPDO by lichtner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -11,7 +11,7 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Fluentpdo</h1>
+      <h1 class="project-name">FluentPDO</h1>
       <h2 class="project-tagline">FluentPDO, smart SQL builder for PHP</h2>
       <a href="https://github.com/lichtner/fluentpdo" class="btn">View on GitHub</a>
       <a href="https://github.com/lichtner/fluentpdo/zipball/master" class="btn">Download .zip</a>
@@ -41,6 +41,11 @@
 </ul>
 
 <h2>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h2>
+
+<p><a href="http://www.sitepoint.com/getting-started-fluentpdo/">Sitepoint - Getting Started with FluentPDO</a></p>
+
+<h2>
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
 
 <h3>
@@ -68,7 +73,7 @@
 <h2>
 <a id="start-usage" class="anchor" href="#start-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Start usage</h2>
 
-<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$pdo</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">PDO</span>(<span class="pl-s"><span class="pl-pds">"</span>mysql:dbname=fblog<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>);</span>
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$pdo</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">PDO</span>(<span class="pl-s"><span class="pl-pds">"</span>mysql:dbname=blog<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>);</span>
 <span class="pl-s1"><span class="pl-smi">$fpdo</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">FluentPDO</span>(<span class="pl-smi">$pdo</span>);</span></pre></div>
 
 <h2>
@@ -154,7 +159,193 @@ LEFT JOIN user ON user.id = article.user_id
 
 <div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>deleteFrom(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>)<span class="pl-k">-&gt;</span>execute();</span></pre></div>
 
-<p>Full documentation can be found on the <a href="http://fluentpdo.com">FluentPDO homepage</a></p>
+<h3>
+<a id="back-reference-referencing-table" class="anchor" href="#back-reference-referencing-table" aria-hidden="true"><span class="octicon octicon-link"></span></a>Back reference (referencing table)</h3>
+
+<p>For join referencing table use colon after table name.</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1">  <span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>leftJoin(<span class="pl-s"><span class="pl-pds">'</span>article:<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>article.title<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1">  <span class="pl-c">// or shortly</span></span>
+<span class="pl-s1">  <span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>article:title<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<div class="highlight highlight-sql"><pre>  <span class="pl-k">SELECT</span> user.<span class="pl-k">*</span>, <span class="pl-c1">article</span>.<span class="pl-c1">title</span> 
+  <span class="pl-k">FROM</span> user 
+      <span class="pl-k">LEFT JOIN</span> article <span class="pl-k">ON</span> <span class="pl-c1">article</span>.<span class="pl-c1">user_id</span> <span class="pl-k">=</span> <span class="pl-c1">user</span>.<span class="pl-c1">id</span></pre></div>
+
+<h3>
+<a id="alias-for-columns-or-tables" class="anchor" href="#alias-for-columns-or-tables" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alias for columns or tables</h3>
+
+<p>You can alias your column with <code>AS</code>:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1">  <span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>user.name AS author_name<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1">  <span class="pl-c1">SELECT</span> <span class="pl-c1">article</span><span class="pl-k">.</span><span class="pl-k">*</span>, <span class="pl-c1">user</span><span class="pl-k">.</span><span class="pl-c1">name</span> <span class="pl-k">AS</span> <span class="pl-c1">author_name</span> </span>
+<span class="pl-s1">  <span class="pl-c1">FROM</span> <span class="pl-c1">article</span> </span>
+<span class="pl-s1">      <span class="pl-c1">LEFT</span> <span class="pl-c1">JOIN</span> <span class="pl-c1">user</span> <span class="pl-c1">ON</span> <span class="pl-c1">user</span><span class="pl-k">.</span><span class="pl-c1">id</span> <span class="pl-k">=</span> <span class="pl-c1">article</span><span class="pl-k">.</span><span class="pl-c1">user_id</span></span></pre></div>
+
+<p>You can join same table two times. Second table have to have another alias:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1">   <span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>comment:user.name AS comment_user_name<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>leftJoin(<span class="pl-s"><span class="pl-pds">'</span>user AS article_author<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">                  <span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>article_author.name AS article_author_name<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<div class="highlight highlight-sql"><pre>  <span class="pl-k">SELECT</span> article.<span class="pl-k">*</span>, <span class="pl-c1">user</span>.<span class="pl-c1">name</span> <span class="pl-k">AS</span> comment_user_name, <span class="pl-c1">article_author</span>.<span class="pl-c1">name</span> <span class="pl-k">AS</span> article_author_name 
+  <span class="pl-k">FROM</span> article 
+      <span class="pl-k">LEFT JOIN</span> comment <span class="pl-k">ON</span> <span class="pl-c1">comment</span>.<span class="pl-c1">article_id</span> <span class="pl-k">=</span> <span class="pl-c1">article</span>.<span class="pl-c1">id</span>  
+      <span class="pl-k">LEFT JOIN</span> user <span class="pl-k">ON</span> <span class="pl-c1">user</span>.<span class="pl-c1">id</span> <span class="pl-k">=</span> <span class="pl-c1">comment</span>.<span class="pl-c1">user_id</span> 
+      <span class="pl-k">LEFT JOIN</span> user <span class="pl-k">AS</span> article_author <span class="pl-k">ON</span> <span class="pl-c1">article_author</span>.<span class="pl-c1">id</span> <span class="pl-k">=</span> <span class="pl-c1">article</span>.<span class="pl-c1">user_id</span></pre></div>
+
+<h3>
+<a id="multi-reference" class="anchor" href="#multi-reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multi reference</h3>
+
+<p>As you can see in previous example references via more then one table are also possible and you can combine dots and colons:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1">  <span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span>from(<span class="pl-s"><span class="pl-pds">'</span>article<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>where(<span class="pl-s"><span class="pl-pds">'</span>comment:user.country.name<span class="pl-pds">'</span></span>, <span class="pl-smi">$country</span>);</span></pre></div>
+
+<div class="highlight highlight-sql"><pre>  <span class="pl-k">SELECT</span> article.<span class="pl-k">*</span> 
+  <span class="pl-k">FROM</span> article 
+      <span class="pl-k">LEFT JOIN</span> comment <span class="pl-k">ON</span> <span class="pl-c1">comment</span>.<span class="pl-c1">article_id</span> <span class="pl-k">=</span> <span class="pl-c1">article</span>.<span class="pl-c1">id</span>  
+      <span class="pl-k">LEFT JOIN</span> user <span class="pl-k">ON</span> <span class="pl-c1">user</span>.<span class="pl-c1">id</span> <span class="pl-k">=</span> <span class="pl-c1">comment</span>.<span class="pl-c1">user_id</span>  
+      <span class="pl-k">LEFT JOIN</span> country <span class="pl-k">ON</span> <span class="pl-c1">country</span>.<span class="pl-c1">id</span> <span class="pl-k">=</span> <span class="pl-c1">user</span>.<span class="pl-c1">country_id</span> 
+  <span class="pl-k">WHERE</span> <span class="pl-c1">country</span>.<span class="pl-c1">name</span> <span class="pl-k">=</span> ?</pre></div>
+
+<p>For more examples see subdirectory tests/</p>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h2>
+
+<h3>
+<a id="select--from" class="anchor" href="#select--from" aria-hidden="true"><span class="octicon octicon-link"></span></a>SELECT * FROM</h3>
+
+<p>Every SELECT query begins with <code>$fpdo-&gt;from($table)</code> followed by as many clauses as you want.</p>
+
+<table>
+<thead>
+<tr>
+<th>syntax</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>from($table)</code></td>
+<td>set $table in FROM clause</td>
+</tr>
+<tr>
+<td><code>from($table, $id)</code></td>
+<td>shortcut for from($table)-&gt;where('id = ?', $id)</td>
+</tr>
+<tr>
+<td><code>select($columns[, ...])</code></td>
+<td>appends SELECT clause with $column or any expresion (e.g. CURDATE() AS today)</td>
+</tr>
+<tr>
+<td>
+<code>leftJoin($joinedTable)</code><br><code>innerJoin($joinedTable)</code>
+</td>
+<td>appends LEFT JOIN or INNER JOIN clause,<br>$joinedTable could be "tableName" only or full join statement<br> ("tableName:" colon means back reference, see Smart join builder)</td>
+</tr>
+<tr>
+<td><code>where($condition[, $parameters])</code></td>
+<td>explained later</td>
+</tr>
+<tr>
+<td><code>groupBy($columns[, ...])</code></td>
+<td>appends GROUP BY clause</td>
+</tr>
+<tr>
+<td><code>having($columns[, ...])</code></td>
+<td>appends HAVING clause</td>
+</tr>
+<tr>
+<td><code>orderBy($columns[, ...])</code></td>
+<td>appends ORDER BY clause</td>
+</tr>
+<tr>
+<td><code>limit($limit)</code></td>
+<td>sets LIMIT clause</td>
+</tr>
+<tr>
+<td><code>offset($offset)</code></td>
+<td>sets OFFSET clause</td>
+</tr>
+<tr>
+<td><code>fetch($column = '')</code></td>
+<td>fetch first row or column only from first row</td>
+</tr>
+<tr>
+<td><code>fetchPairs($key, $value)</code></td>
+<td>fetch pairs</td>
+</tr>
+<tr>
+<td><code>fetchAll($index = '', $selectOnly = '')</code></td>
+<td>fetch all rows. You can specify for fetched array index-column and which columns will be fetched.</td>
+</tr>
+</tbody>
+</table>
+
+<p>You can add clauses <code>select(), where(), groupBy(), having(), orderBy()</code> as many times as you want. Everything will be appended into query. Clauses <code>from(), limit(), offset()</code> rewrite previous setting.</p>
+
+<p>If you want to reset a clause (i.e. remove previous defined statements), call any clause with <code>null</code>. E.g.:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$query</span><span class="pl-k">-&gt;</span>where(<span class="pl-c1">null</span>);   <span class="pl-c">// remove all prev defined where() clauses</span></span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$query</span><span class="pl-k">-&gt;</span>orderBy(<span class="pl-c1">null</span>); <span class="pl-c">// remove all prev defined orderBy() clauses</span></span>
+<span class="pl-s1"><span class="pl-smi">$query</span> <span class="pl-k">=</span> <span class="pl-smi">$query</span><span class="pl-k">-&gt;</span>select(<span class="pl-c1">null</span>)<span class="pl-k">-&gt;</span>select(<span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>); <span class="pl-c"># set "SELECT id FROM ...."</span></span></pre></div>
+
+<h3>
+<a id="where" class="anchor" href="#where" aria-hidden="true"><span class="octicon octicon-link"></span></a>WHERE</h3>
+
+<p>Repetitive calls of <code>where()</code> are connected with <code>AND</code>. The <code>where()</code> $condition can contain ? or :name which is bound by <code>PDO</code> (so no manual escaping is required). If the question mark and colon are missing in <code>where()</code> $condition then the behavior is:</p>
+
+<table>
+<thead>
+<tr>
+<th>syntax</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$table-&gt;where("field", "x")</code></td>
+<td>Translated to field = 'x'</td>
+</tr>
+<tr>
+<td><code>$table-&gt;where("field", null)</code></td>
+<td>Translated to field IS NULL</td>
+</tr>
+<tr>
+<td><code>$table-&gt;where(null)</code></td>
+<td>beware, where(null) reset clause and remove all prev defined conditions</td>
+</tr>
+<tr>
+<td><code>$table-&gt;where("field", array("x", "y"))</code></td>
+<td>Translated to field IN ('x', 'y')</td>
+</tr>
+<tr>
+<td><code>$table-&gt;where("field &gt; ?", "x")</code></td>
+<td>bound by PDO</td>
+</tr>
+<tr>
+<td><code>$table-&gt;where("field &gt; :name", array(':name' =&gt; 'x'))</code></td>
+<td>bound by PDO</td>
+</tr>
+<tr>
+<td><code>$table-&gt;where(array("field1" =&gt; "value1", ...))</code></td>
+<td>Translated to field1 = 'value1' AND ...</td>
+</tr>
+</tbody>
+</table>
+
+<p>Every value is automatically escaped.</p>
+
+<h3>
+<a id="debugging" class="anchor" href="#debugging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debugging</h3>
+
+<p>You can debug queries, parameters, executed time and row count. For debugging set property debug:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span><span class="pl-smi">debug</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>        <span class="pl-c">// log queries to STDERR (for console debugging)</span></span>
+<span class="pl-s1"><span class="pl-smi">$fpdo</span><span class="pl-k">-&gt;</span><span class="pl-smi">debug</span> <span class="pl-k">=</span> <span class="pl-smi">$callback</span>   <span class="pl-c">// or set $callback($FluentQuery)  </span></span>
+<span class="pl-s1">                           <span class="pl-c">// @see tests/26-debug.phpt for expample usage</span></span></pre></div>
 
 <h2>
 <a id="licence" class="anchor" href="#licence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licence</h2>
@@ -162,7 +353,7 @@ LEFT JOIN user ON user.id = article.user_id
 <p>Free for commercial and non-commercial use (<a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License</a> or <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL</a>).</p>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/lichtner/fluentpdo">Fluentpdo</a> is maintained by <a href="https://github.com/lichtner">lichtner</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/lichtner/fluentpdo">FluentPDO</a> is maintained by <a href="https://github.com/lichtner">lichtner</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
