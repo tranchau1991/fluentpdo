@@ -1,0 +1,208 @@
+FluentPDO
+
+FluentPDO, smart SQL builder for PHP
+
+View on GitHub Download .zip Download .tar.gz
+FluentPDO Build Status
+
+FluentPDO - smart SQL builder for PHP.
+
+FluentPDO is small PHP library for rapid query building. Killer feature is "Smart join builder" which generates joins automatically.
+
+Features
+
+Fluent interface for creating queries step by step
+Smart join builder
+Simple API based on PDO and SQL syntax
+Build SELECT, INSERT, UPDATE & DELETE queries
+Small and fast
+Type hinting with code completion in smart IDEs
+Requires PHP 5.1+ with any database supported by PDO
+References
+
+Sitepoint - Getting Started with FluentPDO
+
+Install
+
+Composer
+
+The preferred way to install FluentPDO is via composer.
+
+Add in your composer.json:
+
+"require": {
+    ...
+    "lichtner/fluentpdo": "dev-master"  
+}
+then update your dependencies with composer update.
+
+Copy
+
+If you are not familiar with composer just copy /FluentPDO directory into your libs/ directory then:
+
+include "libs/FluentPDO/FluentPDO.php";
+Start usage
+
+$pdo = new PDO("mysql:dbname=blog", "root", "password");
+$fpdo = new FluentPDO($pdo);
+First example
+
+FluentPDO is easy to use:
+
+$query = $fpdo->from('article')
+            ->where('published_at > ?', $date)
+            ->orderBy('published_at DESC')
+            ->limit(5);
+foreach ($query as $row) {
+    echo "$row[title]\n";
+}
+executed query is:
+
+SELECT article.*
+FROM article
+WHERE published_at > ?
+ORDER BY published_at DESC
+LIMIT 5
+Smart join builder (how to build queries)
+
+If you want to join table you can use full sql join syntax. For example we would like to show list of articles with author name:
+
+$query = $fpdo->from('article')
+              ->leftJoin('user ON user.id = article.user_id')
+              ->select('user.name');
+It was not so much smart, was it? ;-) If your database uses convention for primary and foreign key names, you can write only:
+
+$query = $fpdo->from('article')->leftJoin('user')->select('user.name');
+Smarter? May be. but best practice how to write joins is not to write any joins ;-)
+
+$query = $fpdo->from('article')->select('user.name');
+All three commands create same query:
+
+SELECT article.*, user.name 
+FROM article 
+LEFT JOIN user ON user.id = article.user_id
+Simple CRUD Query Examples
+
+SELECT
+
+$query = $fpdo->from('article')->where('id', 1);
+// or shortly if you select one row by primary key
+$query = $fpdo->from('user', 1);
+INSERT
+
+$values = array('title' => 'article 1', 'content' => 'content 1');
+$query = $fpdo->insertInto('article')->values($values);
+// or shortly
+$query = $fpdo->insertInto('article', $values);
+UPDATE
+
+$set = array('published_at' => new FluentLiteral('NOW()'));
+$query = $fpdo->update('article')->set($set)->where('id', 1);
+// or shortly if you update one row by primary key
+$query = $fpdo->update('article', $set, 1);
+DELETE
+
+$query = $fpdo->deleteFrom('article')->where('id', 1);
+// or shortly if you delete one row by primary key
+$query = $fpdo->deleteFrom('article', 1);
+Note: INSERT, UPDATE and DELETE will be executed after ->execute():
+
+$fpdo->deleteFrom('article', 1)->execute();
+Back reference (referencing table)
+
+For join referencing table use colon after table name.
+
+  $query = $fpdo->from('user')->leftJoin('article:')->select('article.title');
+  // or shortly
+  $query = $fpdo->from('user')->select('article:title');
+  SELECT user.*, article.title 
+  FROM user 
+      LEFT JOIN article ON article.user_id = user.id
+Alias for columns or tables
+
+You can alias your column with AS:
+
+  $query = $fpdo->from('article')->select('user.name AS author_name');
+  SELECT article.*, user.name AS author_name 
+  FROM article 
+      LEFT JOIN user ON user.id = article.user_id
+You can join same table two times. Second table have to have another alias:
+
+   $query = $fpdo->from('article')
+              ->select('comment:user.name AS comment_user_name')
+              ->leftJoin('user AS article_author')
+                  ->select('article_author.name AS article_author_name');
+  SELECT article.*, user.name AS comment_user_name, article_author.name AS article_author_name 
+  FROM article 
+      LEFT JOIN comment ON comment.article_id = article.id  
+      LEFT JOIN user ON user.id = comment.user_id 
+      LEFT JOIN user AS article_author ON article_author.id = article.user_id
+Multi reference
+
+As you can see in previous example references via more then one table are also possible and you can combine dots and colons:
+
+  $query = $fpdo->from('article')->where('comment:user.country.name', $country);
+  SELECT article.* 
+  FROM article 
+      LEFT JOIN comment ON comment.article_id = article.id  
+      LEFT JOIN user ON user.id = comment.user_id  
+      LEFT JOIN country ON country.id = user.country_id 
+  WHERE country.name = ?
+For more examples see subdirectory tests/
+
+API
+
+SELECT * FROM
+
+Every SELECT query begins with $fpdo->from($table) followed by as many clauses as you want.
+
+syntax	description
+from($table)	set $table in FROM clause
+from($table, $id)	shortcut for from($table)->where('id = ?', $id)
+select($columns[, ...])	appends SELECT clause with $column or any expresion (e.g. CURDATE() AS today)
+leftJoin($joinedTable)
+innerJoin($joinedTable)	appends LEFT JOIN or INNER JOIN clause,
+$joinedTable could be "tableName" only or full join statement
+("tableName:" colon means back reference, see Smart join builder)
+where($condition[, $parameters])	explained later
+groupBy($columns[, ...])	appends GROUP BY clause
+having($columns[, ...])	appends HAVING clause
+orderBy($columns[, ...])	appends ORDER BY clause
+limit($limit)	sets LIMIT clause
+offset($offset)	sets OFFSET clause
+fetch($column = '')	fetch first row or column only from first row
+fetchPairs($key, $value)	fetch pairs
+fetchAll($index = '', $selectOnly = '')	fetch all rows. You can specify for fetched array index-column and which columns will be fetched.
+You can add clauses select(), where(), groupBy(), having(), orderBy() as many times as you want. Everything will be appended into query. Clauses from(), limit(), offset() rewrite previous setting.
+
+If you want to reset a clause (i.e. remove previous defined statements), call any clause with null. E.g.:
+
+$query = $query->where(null);   // remove all prev defined where() clauses
+$query = $query->orderBy(null); // remove all prev defined orderBy() clauses
+$query = $query->select(null)->select('id'); # set "SELECT id FROM ...."
+WHERE
+
+Repetitive calls of where() are connected with AND. The where() $condition can contain ? or :name which is bound by PDO (so no manual escaping is required). If the question mark and colon are missing in where() $condition then the behavior is:
+
+syntax	description
+$table->where("field", "x")	Translated to field = 'x'
+$table->where("field", null)	Translated to field IS NULL
+$table->where(null)	beware, where(null) reset clause and remove all prev defined conditions
+$table->where("field", array("x", "y"))	Translated to field IN ('x', 'y')
+$table->where("field > ?", "x")	bound by PDO
+$table->where("field > :name", array(':name' => 'x'))	bound by PDO
+$table->where(array("field1" => "value1", ...))	Translated to field1 = 'value1' AND ...
+Every value is automatically escaped.
+
+Debugging
+
+You can debug queries, parameters, executed time and row count. For debugging set property debug:
+
+$fpdo->debug = true        // log queries to STDERR (for console debugging)
+$fpdo->debug = $callback   // or set $callback($FluentQuery)  
+                           // @see tests/26-debug.phpt for expample usage
+Licence
+
+Free for commercial and non-commercial use (Apache License or GPL).
+
+FluentPDO is maintained by lichtner. This page was generated by GitHub Pages using the Cayman theme by Jason Long.
